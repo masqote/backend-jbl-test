@@ -144,33 +144,43 @@ const init = async () => {
       path: "/import-product",
       handler: async (request, h) => {
         try {
-          const result = await axios.get(
-            "https://api.elevenia.co.id/rest/prodservices/product/listing",
-            { headers: { openapikey: "721407f393e84a28593374cc2b347a98" } }
-          );
-
+          const pagination = 5;
           let products = {};
           let productData = {};
           let countDuplicate = 0;
           let countSuccess = 0;
 
-          parseString(result.data, function (err, results) {
-            products = results.Products.product;
-          });
+          for (let index = 1; index < pagination; index++) {
+            const result = await axios.get(
+              "https://api.elevenia.co.id/rest/prodservices/product/listing",
+              {
+                headers: { openapikey: "721407f393e84a28593374cc2b347a98" },
+                params: {
+                  page: index,
+                },
+              }
+            );
 
-          for (let prd of products) {
-            productData = {
-              name: prd.prdNm[0],
-              sku: prd.sellerPrdCd[0],
-              image: `https://source.unsplash.com/random/?${prd.prdNm}`,
-              price: parseInt(prd.selPrc[0]),
-              description: "",
-            };
+            parseString(result.data, function (err, results) {
+              if (results.Products.product.length > 0) {
+                products = results.Products.product;
+              }
+            });
 
-            const addProduct = await Product.add(productData);
+            for (let prd of products) {
+              productData = {
+                name: prd.prdNm[0],
+                sku: prd.sellerPrdCd[0],
+                image: `https://source.unsplash.com/random/?${prd.prdNm}`,
+                price: parseInt(prd.selPrc[0]),
+                description: "",
+              };
 
-            addProduct.status == "duplicate" ? countDuplicate++ : "";
-            addProduct.status == "success" ? countSuccess++ : "";
+              const addProduct = await Product.add(productData);
+
+              addProduct.status == "duplicate" ? countDuplicate++ : "";
+              addProduct.status == "success" ? countSuccess++ : "";
+            }
           }
 
           let respData = {
