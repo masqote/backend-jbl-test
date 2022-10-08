@@ -1,15 +1,23 @@
 const Connection = require("../dbconfig/db");
 const Products = {};
 
-Products.list = async function () {
+Products.list = async function (limit, offset) {
   const query = {
-    text: "SELECT * FROM products ORDER by products.sku ASC",
+    text: `SELECT * FROM products ORDER by products.id ASC LIMIT '${limit}' OFFSET '${offset}'`,
+  };
+
+  const countQuery = {
+    text: `SELECT count(*) FROM products`,
   };
 
   try {
     const prodList = await Connection.query(query);
+    const countProd = await Connection.query(countQuery);
 
-    return prodList.rows;
+    return {
+      prod_list: prodList.rows,
+      count_prod: countProd.rows,
+    };
   } catch (err) {
     console.log(err);
   }

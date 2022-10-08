@@ -10,6 +10,13 @@ const init = async () => {
   const server = Hapi.server({
     port: 1234,
     host: "localhost",
+    routes: {
+      cors: {
+        origin: ["*"],
+        headers: ["Accept", "Content-Type"],
+        additionalHeaders: ["X-Requested-With"],
+      },
+    },
   });
 
   server.route([
@@ -26,8 +33,18 @@ const init = async () => {
       method: "GET",
       path: "/get-product",
       handler: async (request, h) => {
-        const prodList = await Product.list();
-        return h.response(Responses.apiResponse(200, "Success!", prodList));
+        let limit = request.query.limit;
+        let offset = request.query.offset;
+        const prodList = await Product.list(limit, offset);
+
+        const resultProd = {
+          count_prod: parseInt(prodList.count_prod[0].count),
+          prod_list: prodList.prod_list,
+        };
+
+        return h
+          .response(Responses.apiResponse(200, "Success!", resultProd))
+          .code(200);
       },
     },
     // ADD PRODUCT
@@ -145,7 +162,7 @@ const init = async () => {
             productData = {
               name: prd.prdNm[0],
               sku: prd.sellerPrdCd[0],
-              image: "https://picsum.photos/250",
+              image: `https://source.unsplash.com/random/?${prd.prdNm}`,
               price: parseInt(prd.selPrc[0]),
               description: "",
             };
