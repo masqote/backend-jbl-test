@@ -3,7 +3,7 @@ const Products = {};
 
 Products.list = async function (limit, offset) {
   const query = {
-    text: `SELECT * FROM products ORDER by products.id ASC LIMIT '${limit}' OFFSET '${offset}'`,
+    text: `SELECT * FROM products ORDER by products.id DESC LIMIT '${limit}' OFFSET '${offset}'`,
   };
 
   const countQuery = {
