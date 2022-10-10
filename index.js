@@ -101,7 +101,7 @@ const init = async () => {
     },
     // UPDATE PRODUCT
     {
-      method: "POST",
+      method: "PUT",
       path: "/update-product/{id}",
       handler: async (request, h) => {
         let id = request.params.id;
