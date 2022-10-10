@@ -28,6 +28,14 @@ const init = async () => {
         return "404 Error! Page Not Found!";
       },
     },
+    // HOME
+    {
+      method: "GET",
+      path: "/",
+      handler: async (request, h) => {
+        return "<h1>Hello! you are connected!</h1>";
+      },
+    },
     // GET PRODUCT LIST
     {
       method: "GET",
